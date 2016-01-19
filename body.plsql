@@ -1,5 +1,23 @@
 create or replace package body blob_wrapper as
 
+  c_temp_dir_name constant varchar2(30) := 'TQ84_TEMP_DIR';
+
+  type file_path_r is record (
+    path       varchar2(4000),
+    file_name  varchar2(4000));
+
+  function split_file_path(filepath in varchar2) return file_path_r is -- {
+
+    ret file_path_r;
+  begin
+
+    ret.path      := regexp_replace(filepath, '(.*)(\\|/).*', '\1');
+    ret.file_name := regexp_replace(filepath, '.*(\\|/)(.*)', '\2');
+
+    return ret;
+
+  end split_file_path; -- }
+
   procedure to_file(dir in varchar2, file in varchar2, lob in blob) is/*{*/
     output_file    utl_file.file_type;
     chunk_size     constant pls_integer := 4096;
@@ -30,6 +48,47 @@ create or replace package body blob_wrapper as
     utl_file.fclose(output_file);
 
   end to_file;/*}*/
+
+  procedure to_file(filepath in varchar2, lob in blob) is -- {
+    file_path_ file_path_r;
+
+    procedure create_directory(dir in varchar2) is -- {
+      pragma autonomous_transaction;
+    begin
+
+      execute immediate 'create directory ' || c_temp_dir_name || ' as ''' || dir || '''';
+
+    exception when others then
+      if sqlcode = -1031 then -- insufficient privileges
+        raise_application_error(-20800, 'Could not create directory, needs ''grant create any directory to ... privilege''');
+      end if;
+
+    end create_directory; -- }
+
+    procedure drop_directory is -- {
+      pragma autonomous_transaction;
+    begin
+
+      execute immediate 'drop directory ' || c_temp_dir_name;
+
+    exception when others then
+      if sqlcode = -1031 then -- insufficient privileges
+        raise_application_error(-20800, 'Could not drop directory, needs ''grant drop any directory to ... privilege''');
+      end if;
+
+    end drop_directory; -- }
+
+  begin
+
+    file_path_ := split_file_path(filepath);
+
+    create_directory(file_path_.path);
+
+    to_file(c_temp_dir_name, file_path_.file_name, lob);
+
+    drop_directory;
+
+  end to_file; -- }
 
   function from_file(dir in varchar2, file in varchar2) return blob is/*{*/
     ret blob;
