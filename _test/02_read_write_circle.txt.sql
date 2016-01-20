@@ -6,7 +6,7 @@ begin
   if dbms_lob.getlength(b) != 161202 then
      dbms_output.put_line('Expected size of circle.txt is 161202');
   end if;
---dbms_output.put_line('size of circle.txt: ' || dbms_lob.getlength(b) || ' (expected: 161202)');
+
   blob_wrapper.to_file('LOB_TEST_DIR', 'circle_new.txt', b);
 end;
 /
