@@ -1,11 +1,6 @@
-set serveroutput on size 1000000 format wrapped
-set lines 410
-set trimspool on
-
 declare
   blob_ blob;
 begin
-
 
   select blb into blob_ from tq84_blob_wrapper_test;
   blob_wrapper.to_file('LOB_TEST_DIR', 'circle_from_table.txt', blob_);
