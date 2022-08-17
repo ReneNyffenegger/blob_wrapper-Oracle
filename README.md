@@ -1,7 +1,8 @@
-# blob_wrapper-Oracle
+# PL/SQL package blob_wrapper
 
 A wrapper for Oracle's blob datatype.
 
-## Links
+This repository is archived, further development takes place in https://github.com/ReneNyffenegger/PL-SQL-pkg-blob_wrapper
 
-`blob_wrapper` on my [homepage](http://renenyffenegger.ch/Oracle/Libraries/blob_wrapper/index.html).
+## 
+`blob_wrapper` on my [homepage](https://renenyffenegger.ch/notes/development/databases/Oracle/PL-SQL/libs/personal/blob_wrapper).
